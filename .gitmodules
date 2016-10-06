@@ -1,0 +1,3 @@
+[submodule "node-chakracore"]
+	path = node-chakracore
+	url = https://github.com/ymusiychuk-lohika/node-chakracore.git
