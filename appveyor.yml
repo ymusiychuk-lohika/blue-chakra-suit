@@ -1,0 +1,42 @@
+version: 1.0.{build}
+build_script:
+- ps: >-
+    git submodule update --init
+
+
+    .\node-chakracore\vcbuild.bat chakracore nosign x64
+
+
+    if ($LastExitCode -ne 0) {
+        $host.SetShouldExit($LastExitCode)
+        throw "node-chakracore build failed"
+    }
+
+
+    md .\ChakraCore\Build\VcBuild\bin\x64_test_pogo\buildlogs
+
+    cp .\node-chakracore\Release\node.exe .\ChakraCore\Build\VcBuild\bin\x64_test_pogo\
+
+
+    cd lodash
+
+    npm install
+
+    cp .\patch\qunit-extras.js .\node_modules\qunit-extras\ -force
+
+    cd ..
+
+
+    .\ChakraCore\Build\scripts\pogo_build.ps1 -arch x64 -flavor Test -subtype pogo -solutionFile ".\ChakraCore\Build\Chakra.Core.sln" -binpath ".\ChakraCore\Build\VcBuild\bin\x64_test_pogo\" -binDir ".\ChakraCore\Build\VcBuild\bin\x64_test_pogo\" -logFile ".\ChakraCore\Build\VcBuild\bin\x64_test_pogo\pogo_build_log.txt" -scenarios ".\lodash\test\test.js" -binaryName "node.exe"
+
+
+    if ($LastExitCode -ne 0) {
+        $host.SetShouldExit($LastExitCode)
+        throw "ChakraCore PGO build failed"
+    }
+
+
+    cp .\node-chakracore\pgo-config\jscript.config .\ChakraCore\Build\VcBuild\bin\x64_test_pogo\ -force
+
+
+    .\ChakraCore\Build\VcBuild\bin\x64_test_pogo\node.exe .\lodash\test\test.js
