@@ -4,3 +4,6 @@
 [submodule "lodash"]
 	path = lodash
 	url = https://github.com/ymusiychuk-lohika/lodash.git
+[submodule "ChakraCore"]
+	path = ChakraCore
+	url = https://github.com/ymusiychuk-lohika/ChakraCore.git
