@@ -7,17 +7,6 @@ build_script:
     .\node-chakracore\vcbuild.bat chakracore nosign x64
 
 
-    if ($LastExitCode -ne 0) {
-        $host.SetShouldExit($LastExitCode)
-        throw "node-chakracore build failed"
-    }
-
-
-    md .\ChakraCore\Build\VcBuild\bin\x64_test_pogo\buildlogs
-
-    cp .\node-chakracore\Release\node.exe .\ChakraCore\Build\VcBuild\bin\x64_test_pogo\
-
-
     cd lodash
 
     npm install
@@ -27,16 +16,26 @@ build_script:
     cd ..
 
 
-    .\ChakraCore\Build\scripts\pogo_build.ps1 -arch x64 -flavor Test -subtype pogo -solutionFile ".\ChakraCore\Build\Chakra.Core.sln" -binpath ".\ChakraCore\Build\VcBuild\bin\x64_test_pogo\" -binDir ".\ChakraCore\Build\VcBuild\bin\x64_test_pogo\" -logFile ".\ChakraCore\Build\VcBuild\bin\x64_test_pogo\pogo_build_log.txt" -scenarios ".\lodash\test\test.js" -binaryName "node.exe"
+
+    md .\ChakraCore\Build\VcBuild\bin\x64_test\buildlogs
+
+    .\ChakraCore\Build\scripts\run_build.ps1 -arch x64 -flavor Test -solutionFile ".\ChakraCore\Build\Chakra.Core.sln" -binDir ".\ChakraCore\Build\VcBuild\bin\x64_test\" -logFile ".\ChakraCore\Build\VcBuild\bin\x64_test\pogo_build_log.txt"
 
 
-    if ($LastExitCode -ne 0) {
-        $host.SetShouldExit($LastExitCode)
-        throw "ChakraCore PGO build failed"
-    }
+    cp .\node-chakracore\Release\node.exe .\ChakraCore\Build\VcBuild\bin\x64_test\
+
+    cp .\node-chakracore\pgo-config\jscript.config .\ChakraCore\Build\VcBuild\bin\x64_test\ -force
 
 
-    cp .\node-chakracore\pgo-config\jscript.config .\ChakraCore\Build\VcBuild\bin\x64_test_pogo\ -force
+    .\ChakraCore\Build\VcBuild\bin\x64_test\node.exe .\lodash\test\test.js
 
 
-    .\ChakraCore\Build\VcBuild\bin\x64_test_pogo\node.exe .\lodash\test\test.js
+
+
+
+    md .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\buildlogs
+
+    cp .\node-chakracore\Release\node.exe .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\
+
+
+    .\ChakraCore\Build\scripts\pogo_build.ps1 -arch x64 -flavor Release -subtype pogo -solutionFile ".\ChakraCore\Build\Chakra.Core.sln" -binpath ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\" -binDir ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\" -logFile ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\pogo_build_log.txt" -scenarios ".\lodash\test\test.js" -binaryName "node.exe"
