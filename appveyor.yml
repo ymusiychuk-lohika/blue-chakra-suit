@@ -46,7 +46,8 @@ build_script:
 
     .\ChakraCore\Build\scripts\pogo_build.ps1 -arch x64 -flavor Release -subtype pogo -solutionFile ".\ChakraCore\Build\Chakra.Core.sln" -binpath ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\" -binDir ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\" -logFile ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\pogo_build_log.txt" -scenarios ".\lodash\test\test.js" -binaryName "node.exe"
 
-    cp .\deploy\deploy.ps1 .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\
+    cp .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\node.exe .\deploy\ -force
+    cp .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\ChakraCore.dll .\deploy\ -force
 artifacts:
-- path: ChakraCore/Build/VcBuild/bin/x64_release_pogo
+- path: deploy
   name: chakracore_x64_pogo
