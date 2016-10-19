@@ -1,10 +1,10 @@
 version: 1.0.{build}
+environment:
+  BailOutThreshold: 9000
+  ReJitThreshold: 700
 build_script:
 - ps: >-
     git submodule update --init
-
-
-    .\node-chakracore\vcbuild.bat chakracore nosign x64
 
 
     cd lodash
@@ -22,20 +22,31 @@ build_script:
     .\ChakraCore\Build\scripts\run_build.ps1 -arch x64 -flavor Test -solutionFile ".\ChakraCore\Build\Chakra.Core.sln" -binDir ".\ChakraCore\Build\VcBuild\bin\x64_test\" -logFile ".\ChakraCore\Build\VcBuild\bin\x64_test\pogo_build_log.txt"
 
 
-    cp .\node-chakracore\Release\node.exe .\ChakraCore\Build\VcBuild\bin\x64_test\
-
-    cp .\node-chakracore\pgo-config\jscript.config .\ChakraCore\Build\VcBuild\bin\x64_test\ -force
-
+    cp .\node-bin\*.* .\ChakraCore\Build\VcBuild\bin\x64_test\ -force
 
     .\ChakraCore\Build\VcBuild\bin\x64_test\node.exe .\lodash\test\test.js
 
 
+    $ccmetrics_result = type .\ccmetrics.txt | .\custom-metrics-analyzer\ccmetricsparse.exe -BailOut: $env:BailOutThreshold -ReJit: $env:ReJitThreshold
+
+
+    if ($LastExitCode -ne 0) {
+        $host.SetShouldExit($LastExitCode)
+        throw $ccmetrics_result
+    } else {
+        Write-Host $ccmetrics_result
+    }
 
 
 
     md .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\buildlogs
 
-    cp .\node-chakracore\Release\node.exe .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\
+    cp .\node-bin\*.* .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\ -force
 
 
     .\ChakraCore\Build\scripts\pogo_build.ps1 -arch x64 -flavor Release -subtype pogo -solutionFile ".\ChakraCore\Build\Chakra.Core.sln" -binpath ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\" -binDir ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\" -logFile ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\pogo_build_log.txt" -scenarios ".\lodash\test\test.js" -binaryName "node.exe"
+
+    cp .\deploy\deploy.ps1 .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\
+artifacts:
+- path: ChakraCore\Build\VcBuild\bin\x64_release_pogo\
+  name: chakracore_x64_pogo
