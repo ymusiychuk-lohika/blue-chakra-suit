@@ -48,5 +48,5 @@ build_script:
 
     cp .\deploy\deploy.ps1 .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\
 artifacts:
-- path: ChakraCore\Build\VcBuild\bin\x64_release_pogo\
+- path: ChakraCore/Build/VcBuild/bin/x64_release_pogo
   name: chakracore_x64_pogo
