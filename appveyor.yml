@@ -7,47 +7,48 @@ build_script:
     git submodule update --init
 
 
-    cd lodash
+        cd lodash
 
-    npm install
+        npm install
 
-    cp .\patch\qunit-extras.js .\node_modules\qunit-extras\ -force
+        cp .\patch\qunit-extras.js .\node_modules\qunit-extras\ -force
 
-    cd ..
-
-
-
-    md .\ChakraCore\Build\VcBuild\bin\x64_test\buildlogs
-
-    .\ChakraCore\Build\scripts\run_build.ps1 -arch x64 -flavor Test -solutionFile ".\ChakraCore\Build\Chakra.Core.sln" -binDir ".\ChakraCore\Build\VcBuild\bin\x64_test\" -logFile ".\ChakraCore\Build\VcBuild\bin\x64_test\pogo_build_log.txt"
-
-
-    cp .\node-bin\*.* .\ChakraCore\Build\VcBuild\bin\x64_test\ -force
-
-    .\ChakraCore\Build\VcBuild\bin\x64_test\node.exe .\lodash\test\test.js
-
-
-    $ccmetrics_result = type .\ccmetrics.txt | .\custom-metrics-analyzer\ccmetricsparse.exe -BailOut: $env:BailOutThreshold -ReJit: $env:ReJitThreshold
-
-
-    if ($LastExitCode -ne 0) {
-        $host.SetShouldExit($LastExitCode)
-        throw $ccmetrics_result
-    } else {
-        Write-Host $ccmetrics_result
-    }
+        cd ..
 
 
 
-    md .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\buildlogs
+        md .\ChakraCore\Build\VcBuild\bin\x64_test\buildlogs
 
-    cp .\node-bin\*.* .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\ -force
+        .\ChakraCore\Build\scripts\run_build.ps1 -arch x64 -flavor Test -solutionFile ".\ChakraCore\Build\Chakra.Core.sln" -binDir ".\ChakraCore\Build\VcBuild\bin\x64_test\" -logFile ".\ChakraCore\Build\VcBuild\bin\x64_test\pogo_build_log.txt"
 
 
-    .\ChakraCore\Build\scripts\pogo_build.ps1 -arch x64 -flavor Release -subtype pogo -solutionFile ".\ChakraCore\Build\Chakra.Core.sln" -binpath ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\" -binDir ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\" -logFile ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\pogo_build_log.txt" -scenarios ".\lodash\test\test.js" -binaryName "node.exe"
+        cp .\node-bin\*.* .\ChakraCore\Build\VcBuild\bin\x64_test\ -force
 
-    cp .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\node.exe .\deploy\ -force
-    cp .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\ChakraCore.dll .\deploy\ -force
+        .\ChakraCore\Build\VcBuild\bin\x64_test\node.exe .\lodash\test\test.js
+
+
+        $ccmetrics_result = type .\ccmetrics.txt | .\custom-metrics-analyzer\ccmetricsparse.exe -BailOut: $env:BailOutThreshold -ReJit: $env:ReJitThreshold
+
+
+        if ($LastExitCode -ne 0) {
+            $host.SetShouldExit($LastExitCode)
+            throw $ccmetrics_result
+        } else {
+            Write-Host $ccmetrics_result
+        }
+
+
+
+        md .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\buildlogs
+
+        cp .\node-bin\*.* .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\ -force
+
+
+        .\ChakraCore\Build\scripts\pogo_build.ps1 -arch x64 -flavor Release -subtype pogo -solutionFile ".\ChakraCore\Build\Chakra.Core.sln" -binpath ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\" -binDir ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\" -logFile ".\ChakraCore\Build\VcBuild\bin\x64_release_pogo\pogo_build_log.txt" -scenarios ".\lodash\test\test.js" -binaryName "node.exe"
+
+        cp .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\node.exe .\deploy\ -force
+        cp .\ChakraCore\Build\VcBuild\bin\x64_release_pogo\ChakraCore.dll .\deploy\ -force
+test: off
 artifacts:
 - path: deploy
   name: chakracore_x64_pogo
