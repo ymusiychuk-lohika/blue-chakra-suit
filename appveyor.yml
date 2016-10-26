@@ -2,6 +2,7 @@ version: 1.0.{build}
 environment:
   BailOutThreshold: 9000
   ReJitThreshold: 700
+  BenchmarkRuns: 10
 build_script:
 - ps: >-
     git submodule update --init

@@ -1,3 +1,5 @@
+$benchmarkRuns = $env:BenchmarkRuns
+
 $projectID = $env:APPVEYOR_PROJECT_ID
 $projectName = $env:APPVEYOR_PROJECT_NAME
 $accountName = $env:APPVEYOR_ACCOUNT_NAME
@@ -39,7 +41,15 @@ If (Test-Path .\node-cc-benchmark) {
 }
 
 git clone https://github.com/abodalevsky/node-cc-benchmark.git
-node .\node-cc-benchmark\compare.js --old .\node-bin-old\node.exe --new .\node.exe arrays assert buffers crypto domain es process querystring streams string_decoder util > .\compare-results.txt
+
+
+If ($benchmarkRuns) {
+    Write-Host "Benchmark will run" $benchmarkRuns "times"
+    node .\node-cc-benchmark\compare.js --runs $benchmarkRuns --old .\node-bin-old\node.exe --new .\node.exe arrays assert buffers crypto domain es process querystring streams string_decoder util > .\compare-results.txt
+} Else {
+    node .\node-cc-benchmark\compare.js --old .\node-bin-old\node.exe --new .\node.exe arrays assert buffers crypto domain es process querystring streams string_decoder util > .\compare-results.txt
+}
+
 type .\compare-results.txt | & $env:RScript .\node-cc-benchmark\compare.R > $resultsFile
 
 $testsPassed = $false
